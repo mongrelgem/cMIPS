@@ -1,0 +1,327 @@
+MIPS32 instruction set
+MIPS instructions can be divided into the following categories: 
+null operation no-op; 
+register/register transfers: widely used, including conditional transfers; constant loading: integer literals as values ​​and addresses; arithmetic/logic instructions; integer multiplication , division and remainder; integer multiplication; load and store; jump, subroutine call and branch; breakpoint and trap; CP0 function: CPU control instruction floating point; user mode limited access: rdhwr and synci Note: 
+The 64-bit version begins with "d", the unsigned number ends with "u", the immediate value usually ends with "i", the byte operation ends with "b", the double word operation ends with "d", and the word operation is " w" end 1, empty operation: nop: equivalent to sll zero, zero, o, ssnop: equals sll zero, zero, 1. This instruction must not be sent simultaneously with other instructions, thus ensuring that it takes at least one clock cycle to run. . This does not matter on a simple pipelined CPU, but it is useful for implementing forced delays on complex implementations. 2. Register/register transfer: move: Usually implemented with or with the $zero register, or with addu. Movf, movt, movn, movz: conditional transfer. 3, constant loading: dla, la: macro instructions used to load the address of some marked position or variable in the program; dli, li: load immediate constant, this is a macro; lui: load immediate Go to the register high. 4, arithmetic / logical operations: add, addi, dadd, daddi, addu, addiu, daddu, daddiu, dsub, sub, subu: addition instructions and subtraction instructions; abs, dabs: absolute value; dneg, neg, negu: take the opposite Number; and, andi, or, ori, xor, nor: bitwise logical operation instruction; drol, rol, ror: cyclic shift instruction; sll, srl, sra: shift. 5. Condition setting instructions: slt, slti, sltiu, sltu, seq, sge, sle, sne: condition setting.
+6
+, integer multiplication, division, and remainder: div, mul, rem, and so on. 7, integer multiplication (accumulation): mad and so on. 8, loading and storage: lb, ld, ldl, ldr, sdl, sdr, lh, lhu, ll, sc, pref, sb and other operations. 9, floating point loading and storage: l.d, l.s, s.d, s.s and other common MIPS instruction set and format:
+MIPS instruction set (total 31)
+Mnemonic
+Instruction format
+Example
+Example meaning
+Operation and its explanation
+Bit #
+31..26
+25..21
+20..16
+15..11
+10..6
+5..0
+R-type
+Op
+Rs
+Rt
+Rd
+Shamt
+Func
+Add
+000000
+Rs
+Rt
+Rd
+00000
+100000
+Add $1,$2,$3
+$1=$2+$3
+Rd <- rs + rt ; where rs=$2, rt=$3, rd=$1
+Addu
+000000
+Rs
+Rt
+Rd
+00000
+100001
+Addu $1, $2, $3
+$1=$2+$3
+Rd <- rs + rt ; where rs=$2, rt=$3, rd=$1, unsigned
+Sub
+000000
+Rs
+Rt
+Rd
+00000
+100010
+Sub $1,$2,$3
+$1=$2-$3
+Rd <- rs - rt ; where rs=$2, rt=$3, rd=$1
+Subu
+000000
+Rs
+Rt
+Rd
+00000
+100011
+Subu $1,$2,$3
+$1=$2-$3
+Rd <- rs - rt ; where rs=$2, rt=$3, rd=$1, unsigned
+And
+000000
+Rs
+Rt
+Rd
+00000
+100100
+And $1,$2,$3
+$1=$2 & $3
+Rd <- rs & rt ; where rs=$2, rt=$3, rd=$1
+Or
+000000
+Rs
+Rt
+Rd
+00000
+100101
+Or $1,$2,$3
+$1=$2 | $3
+Rd <- rs | rt ; where rs=$2, rt=$3, rd=$1
+Xor
+000000
+Rs
+Rt
+Rd
+00000
+100110
+Xor $1, $2, $3
+$1=$2 ^ $3
+Rd <- rs xor rt ; where rs=$2, rt=$3, rd=$1 (exclusive or)
+Nor
+000000
+Rs
+Rt
+Rd
+00000
+100111
+Nor $1,$2,$3
+$1=~($2 | $3)
+Rd <- not(rs | rt) ; where rs=$2, rt=$3, rd=$1 (or not)
+Slt
+000000
+Rs
+Rt
+Rd
+00000
+101010
+Slt $1, $2, $3
+If($2<$3) $1=1 else $1=0
+If (rs < rt) rd=1 else rd=0 ; where rs=$2,rt=$3, rd=$1
+Sltu
+000000
+Rs
+Rt
+Rd
+00000
+101011
+Sltu $1, $2, $3
+If($2<$3) $1=1 else $1=0
+If (rs < rt) rd=1 else rd=0 ; where rs=$2, rt=$3, rd=$1 (unsigned number)
+Sll
+000000
+00000
+Rt
+Rd
+Shamt
+000000
+Sll $1, $2, 10
+$1=$2<<10
+Rd <- rt << shamt ;shamt stores the number of shifts, which is the immediate value in the instruction, where rt=$2, rd=$1
+Srl
+000000
+00000
+Rt
+Rd
+Shamt
+000010
+Srl $1, $2,10
+$1=$2>>10
+Rd <- rt >> shamt ;(logical) , where rt=$2, rd=$1
+Sra
+000000
+00000
+Rt
+Rd
+Shamt
+000011
+Sra $1, $2, 10
+$1=$2>>10
+Rd <- rt >> shamt ;(arithmetic) Note that the sign bit is reserved where rt=$2, rd=$1
+Sllv
+000000
+Rs
+Rt
+Rd
+00000
+000100
+Sllv $1, $2, $3
+$1=$2<<$3
+Rd <- rt << rs ; where rs=$3,rt=$2, rd=$1
+Srlv
+000000
+Rs
+Rt
+Rd
+00000
+000110
+Srlv $1, $2, $3
+$1=$2>>$3
+Rd <- rt >> rs ;(logical) where rs=$3, rt=$2, rd=$1
+Srav
+000000
+Rs
+Rt
+Rd
+00000
+000111
+Srav $1, $2, $3
+$1=$2>>$3
+Rd <- rt >> rs ;(arithmetic) Note that the sign bit is reserved where rs=$3, rt=$2, rd=$1
+Jr
+000000
+Rs
+00000
+00000
+00000
+001000
+Jr $31
+Goto $31
+PC <- rs
+I-type
+Op
+Rs
+Rt
+Immediate
+Addi
+001000
+Rs
+Rt
+Immediate
+Addi $1, $2,100
+$1=$2+100
+Rt <- rs + (sign-extend)immediate ; where rt=$1, rs=$2
+Addiu
+001001
+Rs
+Rt
+Immediate
+Addiu $1, $2,100
+$1=$2+100
+Rt <- rs + (zero-extend)immediate ; where rt=$1, rs=$2
+Andi
+001100
+Rs
+Rt
+Immediate
+Andi $1, $2,10
+$1=$2 & 10
+Rt <- rs & (zero-extend)immediate ; where rt=$1, rs=$2
+Ori
+001101
+Rs
+Rt
+Immediate
+Andi $1, $2,10
+$1=$2 | 10
+Rt <- rs | (zero-extend)immediate ; where rt=$1, rs=$2
+Xori
+001110
+Rs
+Rt
+Immediate
+Andi $1, $2,10
+$1=$2 ^ 10
+Rt <- rs xor (zero-extend)immediate ; where rt=$1,rs=$2
+Lui
+001111
+00000
+Rt
+Immediate
+Lui $1,100
+$1=100*65536
+Rt <- immediate*65536 ; put 16-bit immediate value to the upper 16 bits of the destination register, fill the lower 16 bits of the destination register with 0
+Lw
+100011
+Rs
+Rt
+Immediate
+Lw $1,10 ($2)
+$1=memory[$2 +10]
+Rt <- memory[rs + (sign-extend)immediate] ;rt=$1,rs=$2
+Sw
+101011
+Rs
+Rt
+Immediate
+Sw $1,10($2)
+Memory[$2+10] =$1
+Memory[rs + (sign-extend)immediate] <- rt ;rt=$1,rs=$2
+Beq
+000100
+Rs
+Rt
+Immediate
+Beq $1,$2,10
+If($1==$2) goto PC+4+40
+If (rs == rt) PC <- PC+4 + (sign-extend)immediate<<2
+Bne
+000101
+Rs
+Rt
+Immediate
+Bne $1, $2, 10
+If($1!=$2) goto PC+4+40
+If (rs != rt) PC <- PC+4 + (sign-extend)immediate<<2
+Slti
+001010
+Rs
+Rt
+Immediate
+Slti $1, $2,10
+If($2<10) $1=1 else $1=0
+If (rs <(sign-extend)immediate) rt=1 else rt=0 ; where rs=$2,rt=$1
+Sltiu
+001011
+Rs
+Rt
+Immediate
+Sltiu $1, $2,10
+If($2<10) $1=1 else $1=0
+If (rs <(zero-extend)immediate) rt=1 else rt=0 ; where rs=$2,rt=$1
+J-type
+Op
+Address
+j
+000010
+Address
+j 10000
+Goto 10000
+PC <- (PC+4)[31..28],address,0,0 ;address=10000/4
+Jal
+000011
+Address
+Jal 10000
+$31<-PC+4; goto 10000
+$31<-PC+4;PC <- (PC+4)[31..28],address,0,0 ;address=10000/4
+More complete MIPS assembly instructions
+Arithmetic Instructions
+Abs des, src1 # des gets the absolute value of src1.
+Add(u) des, src1, src2 # des gets src1 + src2.
+Addi $t2,$t3,5 # $t2 = $t3 + 5 plus 16-bit immediate
+Addiu $t2,$t3,5 # $t2 = $t3 + 5 plus 16-bit unsigned immediate
+Sub(u) des, src1, src2 # des gets src1 - src2.
+Div(u) src1, reg2 # Divide src1 by reg2, leaving the quotient in register
+# lo and the remainder in register hi.
+Div(u) des, src1, src2 # des gets src1 / src2.
+Mul des, src1, src2 # des gets src1 * src2.
+Mulo des, src1, src2 # des gets src1 * src2, with overflow.
+Mult(u) src1, reg2 # Multiply src1 and reg2, leaving the low-order word
+# in register lo and the high-order word in regis
